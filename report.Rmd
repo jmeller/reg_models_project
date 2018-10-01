@@ -12,7 +12,8 @@ Some general insights about the data set and the analyses.
 # Data loading
 ```{r}
 data(mtcars)
-plot(cars)
+
+boxplot(mpg ~ am, data = mtcars, main = "Distribution of mpg", xlab = "AM")
 
 ```
 
@@ -38,7 +39,7 @@ summary(fit2)
 - confidence intervals / boxplots
 - residual plot
 ```{r}
-plot(fit$residuals)
+plot(fit2$residuals)
 ```
 
 
