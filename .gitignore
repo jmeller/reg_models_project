@@ -1,3 +1,6 @@
 
 \.Rhistory
 \.Rproj.*
+.RData
+*.html
+*.pdf

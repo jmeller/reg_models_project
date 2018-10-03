@@ -1,0 +1,129 @@
+---
+title: 'Motor Trend: The Relationship between MPG and Car-related Indicators'
+author: "Jan"
+subtitle: Regression Models Course Project
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+# Executive Summary
+Some general insights about the data set and the analyses.
+
+
+# Exploratory analyses
+
+The main body of my report concentrates on my major findings as well as my approach of answering the questions of this project. All supporting code fragments and graphs can be found in the appendix. As a first step, I performed a minor data transformation operation to transform the am variable into a factor. The graph "Distribution of mpg" shows the distributions of the miles per gallon (mpg) of the cars in the sample divided into two groups where the group identified by M consists of cars with manual transmission and group AM of cars with automatic transmission. The boxplot shows that the median of the AM group for mpg is considerably higher than that of group M. Hence, my working hypothesis is that cars with automatic transmission achieve higher mpg values.
+
+In a next step, I analyzed correlations between the different variables in the mtcars dataset. I found a considerable amount of correlation between the variables in the dataset which makes it hard to analyze the impact of single predictors. This has to be kept in mind when interpreting the following results.
+
+# Data analysis
+
+I performed a regression analysis to answer the question whether manual or automatic transmission would be beneficial to mpg. In order to consider important control variables, I used stepwise model selection which led to my final model. As can be seen from the results of the model selection process, the best model is
+mpg ~ wt + qsec + am. 
+
+In this model which controls for the influence of the car's weight as well as the qsec performance measure, we can find a statistically significant difference in mpg values for manual and automatic transmission cars. 
+
+
+
+# Appendix: Code & Graphs
+```{r, results='hide'}
+suppressMessages(library(tidyverse))
+suppressMessages(library(magrittr))
+suppressMessages(library(GGally))
+data(mtcars)
+
+# data preprocessing: am as factor
+mtcars %<>% mutate(transmission = factor(am, levels = c(0, 1), labels = c(" M", " AM")))
+```
+
+
+```{r}
+boxplot(mpg ~ transmission, data = mtcars, main = "Distribution of mpg", ylab = "mpg",
+        xlab = "type of transmission")
+```
+
+
+```{r}
+mtcars %>% select(-mpg, -transmission) %>% ggpairs
+```
+
+
+## Predictive modeling
+```{r}
+fit_all <- lm(mpg ~ ., data = mtcars)
+summary(fit_all)
+```
+```{r}
+plot(predict(fit_all), resid(fit_all))
+```
+
+```{r}
+step(fit_all, k = log(nrow(mtcars)))
+```
+
+
+```{r}
+fit <- lm(mpg ~ transmission + gear - 1, data = mtcars)
+summary(fit)
+```
+
+```{r}
+fit2 <- lm(mpg ~ transmission - 1, data = mtcars)
+summary(fit2)
+```
+
+
+- some facets / results / outcome of model selection process
+- confidence intervals / boxplots
+- residual plot
+
+```{r}
+fit_final <- lm(mpg ~ wt + qsec + transmission - 1, data = mtcars)
+summary(fit_final)
+```
+
+
+
+```{r}
+plot(fit2)
+```
+```{r}
+anova(fit2, fit, fit_all)
+```
+
+
+
+```{r}
+e <- resid(fit2)
+x <- mtcars$am
+
+plot(x, e, xlab = "Transmission manual (=0) or automatic (=1)", ylab = "Residuals", main = "Residuals vs. Predictor AM")
+```
+```{r}
+t.test(mpg~am, data = mtcars)
+```
+
+
+# Results interpretation
+
+
+
+# Questions to answer:
+You work for Motor Trend, a magazine about the automobile industry. Looking at a data set of a collection of cars, they are interested in exploring the relationship between a set of variables and miles per gallon (MPG) (outcome). They are particularly interested in the following two questions:
+
+- “Is an automatic or manual transmission better for MPG”
+
+- "Quantify the MPG difference between automatic and manual transmissions"
+
+Review criteria:
+
+1. Did the student interpret the coefficients correctly?
+2. Did the student do some exploratory data analyses?
+3. Did the student fit multiple models and detail their strategy for model selection?
+4. Did the student answer the questions of interest or detail why the question(s) is (are) not answerable?
+5. Did the student do a residual plot and some diagnostics?
+6. Did the student quantify the uncertainty in their conclusions and/or perform an inference correctly?
+7. Was the report brief (about 2 pages long) for the main body of the report and no longer than 5 with supporting appendix of figures?
+8. Did the report include an executive summary?
+9. Was the report done in Rmd (knitr)?

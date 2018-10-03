@@ -1,8 +1,10 @@
 ---
-title: "Motor Trend: The Relationship between MPG and Car-related Indicators"
-subtitle: "Regression Models Course Project"
+title: 'Motor Trend: The Relationship between MPG and Car-related Indicators'
 author: "Jan"
-output: html_notebook
+subtitle: Regression Models Course Project
+output:
+  html_notebook: default
+  pdf_document: default
 ---
 
 # Executive Summary
@@ -10,11 +12,19 @@ Some general insights about the data set and the analyses.
 
 
 # Data loading
-```{r}
+```{r, results='hide'}
+library(tidyverse)
+library(magrittr)
 data(mtcars)
 
-boxplot(mpg ~ am, data = mtcars, main = "Distribution of mpg", xlab = "AM")
+# data preprocessing
+mtcars %<>% mutate(am = factor(am, levels = c(0, 1), labels = c("M", "AM")))
+```
 
+```{r}
+
+
+boxplot(mpg ~ am, data = mtcars, main = "Distribution of mpg")
 ```
 
 # Data analysis
@@ -38,8 +48,18 @@ summary(fit2)
 - some facets / results / outcome of model selection process
 - confidence intervals / boxplots
 - residual plot
+
 ```{r}
 plot(fit2$residuals)
+```
+```{r}
+e <- resid(fit2)
+x <- mtcars$am
+
+plot(x, e, xlab = "Transmission manual (=0) or automatic (=1)", ylab = "Residuals", main = "Residuals vs. Predictor AM")
+```
+```{r}
+t.test(mpg~am, data = mtcars)
 ```
 
 

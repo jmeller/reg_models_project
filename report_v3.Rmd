@@ -1,0 +1,97 @@
+---
+title: 'Motor Trend: The Relationship between MPG and Car-related Indicators'
+author: "Jan"
+subtitle: Regression Models Course Project
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+
+# Executive Summary
+Some general insights about the data set and the analyses.
+
+```{r data_preprocessing, include=FALSE, results='hide'}
+lapply(c("tidyverse", "magrittr", "GGally", "gridExtra"), 
+       function(lib) 
+         suppressWarnings(suppressMessages(require(lib, character.only = T))))
+data(mtcars)
+# data preprocessing: am as factor
+mtcars %<>% mutate(transmission = factor(am, levels = c(0, 1), labels = c(" M", " AM")))
+```
+
+# Exploratory analyses
+
+```{r exp_boxplot, echo=FALSE, out.width='.49\\linewidth'}
+boxplot(mpg ~ transmission, data = mtcars, main = "Distribution of mpg", 
+        ylab = "mpg", xlab = "type of transmission")
+
+mtcars %>% select(-mpg, -transmission) %>% 
+  ggpairs(upper = list(continuous = wrap("cor", size = 1.8)), 
+          lower=list(continuous=wrap("points", size = 0.1)), 
+          axisLabels = 'none',
+          title = "Correlation among predictors")
+```
+The boxplot shows that the median of the AM group for mpg is considerably higher than that of group M. Hence, my working hypothesis is that cars with automatic transmission achieve higher mpg values.
+
+However, as can be seen from the second graph, there exists a considerable amount of correlation between the input variables. This should be kept in mind when interpreting the subsequent results.
+
+# Predictive modeling
+
+## Regression analysis to quantify the difference between manual and automatic transmission in terms of mpg
+
+First, a step-wise model selection was performed, resulting in the following best model. The code and result of the model selection can be found in the appendix.
+
+```{r pred_final_model}
+fit_final <- lm(mpg ~ wt + qsec + transmission, data = mtcars)
+coef(fit_final)
+```
+
+In this model which controls for the influence of the car's weight as well as the qsec performance measure, we can find a statistically significant difference in mpg values for manual and automatic transmission cars. 
+
+```{r conf_int}
+summary(fit_final)$coefficients[4] + c(-1, 1) * 
+  qt(.975, df = fit_final$df) * 
+  coef(summary(fit_final))[,2][4]
+```
+
+
+## Residuals & Diagnostics
+```{r res_plot, echo=FALSE, fig.height=3, fig.width=5}
+plot(predict(fit_final), resid(fit_final), pch = 21, xlab = "Predicted mpg",
+     ylab = "Residuals", main = "Residuals vs. Predicted values")
+```
+
+There is at least not an obvious pattern in the residuals so we can assume that there is no heteroscedasticity.
+
+# Conclusion
+
+
+# Appendix: Code & Graphs
+
+## Step-wise model selection
+```{r model_selection}
+fit_all <- lm(mpg ~ ., data = mtcars)
+step(fit_all, k = log(nrow(mtcars)))
+```
+
+
+
+# Questions to answer:
+You work for Motor Trend, a magazine about the automobile industry. Looking at a data set of a collection of cars, they are interested in exploring the relationship between a set of variables and miles per gallon (MPG) (outcome). They are particularly interested in the following two questions:
+
+- “Is an automatic or manual transmission better for MPG”
+
+- "Quantify the MPG difference between automatic and manual transmissions"
+
+Review criteria:
+
+1. Did the student interpret the coefficients correctly?
+2. Did the student do some exploratory data analyses?
+3. Did the student fit multiple models and detail their strategy for model selection?
+4. Did the student answer the questions of interest or detail why the question(s) is (are) not answerable?
+5. Did the student do a residual plot and some diagnostics?
+6. Did the student quantify the uncertainty in their conclusions and/or perform an inference correctly?
+7. Was the report brief (about 2 pages long) for the main body of the report and no longer than 5 with supporting appendix of figures?
+8. Did the report include an executive summary?
+9. Was the report done in Rmd (knitr)?
