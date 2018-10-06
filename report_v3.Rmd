@@ -9,7 +9,10 @@ output:
 
 
 # Executive Summary
-Some general insights about the data set and the analyses.
+- I analyzed a data set containing 32 car models in order to answer the question whether automatic or manual transmission is favorable in terms of mpg
+- Based on a linear regression analysis, a statistically significant difference between cars with automatic and manual transmission can be found.
+- A Step-wise model selection procedure was chosen, resulting in a regression model that controls for the qsec performance measure as well as the cars' weights
+- Based on this model, I find a statistically significant difference of 2.936 mpg between cars with automatic versus cars with manual transmission
 
 ```{r data_preprocessing, include=FALSE, results='hide'}
 lapply(c("tidyverse", "magrittr", "GGally", "gridExtra"), 
@@ -38,23 +41,23 @@ However, as can be seen from the second graph, there exists a considerable amoun
 
 # Predictive modeling
 
-## Regression analysis to quantify the difference between manual and automatic transmission in terms of mpg
-
-First, a step-wise model selection was performed, resulting in the following best model. The code and result of the model selection can be found in the appendix.
+I chose a regression analysis to quantify the difference between manual and automatic transmission in terms of mpg. First, a step-wise model selection was performed, resulting in the following best model. The code and result of the model selection can be found in the appendix.
 
 ```{r pred_final_model}
 fit_final <- lm(mpg ~ wt + qsec + transmission, data = mtcars)
 coef(fit_final)
 ```
 
-In this model which controls for the influence of the car's weight as well as the qsec performance measure, we can find a statistically significant difference in mpg values for manual and automatic transmission cars. 
+In this model which controls for the influence of the car's weight as well as the qsec performance measure, we can find a notable difference in mpg values for manual and automatic transmission cars. 
+
+Now the question arises how much uncertainty remains around this estimated performance difference. For this reason, I determined the 95\% confidence interval for the estimate:
 
 ```{r conf_int}
-summary(fit_final)$coefficients[4] + c(-1, 1) * 
-  qt(.975, df = fit_final$df) * 
+summary(fit_final)$coefficients[4] + c(-1, 1) * qt(.975, df = fit_final$df) * 
   coef(summary(fit_final))[,2][4]
 ```
 
+As can be seen, the entire confidence interval is positive, i.e., if we had access to many more car data sets that were drawn from the same total car population and we repeated this estimation procedure, we can expect that in at least 95\% of the cases the estimate for the AM vs. M mpg difference would be within the confidence interval. Hence, we can say that there is a statistically significant difference between cars with automatic and manual transmissions and based on our analysis, automatic transmission is favorable.
 
 ## Residuals & Diagnostics
 ```{r res_plot, echo=FALSE, fig.height=3, fig.width=5}
@@ -62,36 +65,16 @@ plot(predict(fit_final), resid(fit_final), pch = 21, xlab = "Predicted mpg",
      ylab = "Residuals", main = "Residuals vs. Predicted values")
 ```
 
-There is at least not an obvious pattern in the residuals so we can assume that there is no heteroscedasticity.
+The plot of the residuals does not reveal any obvious pattern so I assume that there is no heteroscedasticity. 
 
 # Conclusion
-
+The outcome of the regression analysis suggests that cars with automatic transmission achieve on average 2.936 more miles per gallon than cars with manual transmission when controlling for the cars' weights as well as the qsec performance measure. Also, since the 95\% confidence interval for this parameter estimate is positive, a statistical test would allows us to reject the null hypothesis that both car types have a similar mpg (and hence the differences would be random).
+However, as can be seen from the exploratory analyses, the input parameters are highly correlated. For this reason, coefficient estimates for single parameters are highly unreliable due to multicollinearity. For this reason, a more profound analysis should be performed where first the correlations between input variables has to be resolved as well as more in-depth explorations of the distribution of residuals in order to shed light on the reliability of the results. However, this would be beyond the scope of this report.
 
 # Appendix: Code & Graphs
 
 ## Step-wise model selection
 ```{r model_selection}
-fit_all <- lm(mpg ~ ., data = mtcars)
+fit_all <- lm(mpg ~ ., data = mtcars[,-12])
 step(fit_all, k = log(nrow(mtcars)))
 ```
-
-
-
-# Questions to answer:
-You work for Motor Trend, a magazine about the automobile industry. Looking at a data set of a collection of cars, they are interested in exploring the relationship between a set of variables and miles per gallon (MPG) (outcome). They are particularly interested in the following two questions:
-
-- “Is an automatic or manual transmission better for MPG”
-
-- "Quantify the MPG difference between automatic and manual transmissions"
-
-Review criteria:
-
-1. Did the student interpret the coefficients correctly?
-2. Did the student do some exploratory data analyses?
-3. Did the student fit multiple models and detail their strategy for model selection?
-4. Did the student answer the questions of interest or detail why the question(s) is (are) not answerable?
-5. Did the student do a residual plot and some diagnostics?
-6. Did the student quantify the uncertainty in their conclusions and/or perform an inference correctly?
-7. Was the report brief (about 2 pages long) for the main body of the report and no longer than 5 with supporting appendix of figures?
-8. Did the report include an executive summary?
-9. Was the report done in Rmd (knitr)?
