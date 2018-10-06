@@ -9,6 +9,7 @@ output:
 
 
 # Executive Summary
+
 - I analyzed a data set containing 32 car models in order to answer the question whether automatic or manual transmission is favorable in terms of mpg
 - Based on a linear regression analysis, a statistically significant difference between cars with automatic and manual transmission can be found.
 - A Step-wise model selection procedure was chosen, resulting in a regression model that controls for the qsec performance measure as well as the cars' weights
