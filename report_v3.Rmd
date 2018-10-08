@@ -61,7 +61,7 @@ summary(fit_final)$coefficients[4] + c(-1, 1) * qt(.975, df = fit_final$df) *
 As can be seen, the entire confidence interval is positive, i.e., if we had access to many more car data sets that were drawn from the same total car population and we repeated this estimation procedure, we can expect that in at least 95\% of the cases the estimate for the AM vs. M mpg difference would be within the confidence interval. Hence, we can say that there is a statistically significant difference between cars with automatic and manual transmissions and based on our analysis, automatic transmission is favorable.
 
 ## Residuals & Diagnostics
-```{r res_plot, echo=FALSE, fig.height=3, fig.width=5}
+```{r res_plot, echo=FALSE, fig.height=2.8, fig.width=5}
 plot(predict(fit_final), resid(fit_final), pch = 21, xlab = "Predicted mpg",
      ylab = "Residuals", main = "Residuals vs. Predicted values")
 ```
@@ -69,8 +69,8 @@ plot(predict(fit_final), resid(fit_final), pch = 21, xlab = "Predicted mpg",
 The plot of the residuals does not reveal any obvious pattern so I assume that there is no heteroscedasticity. 
 
 # Conclusion
-The outcome of the regression analysis suggests that cars with automatic transmission achieve on average 2.936 more miles per gallon than cars with manual transmission when controlling for the cars' weights as well as the qsec performance measure. Also, since the 95\% confidence interval for this parameter estimate is positive, a statistical test would allows us to reject the null hypothesis that both car types have a similar mpg (and hence the differences would be random).
-However, as can be seen from the exploratory analyses, the input parameters are highly correlated. For this reason, coefficient estimates for single parameters are highly unreliable due to multicollinearity. For this reason, a more profound analysis should be performed where first the correlations between input variables has to be resolved as well as more in-depth explorations of the distribution of residuals in order to shed light on the reliability of the results. However, this would be beyond the scope of this report.
+The outcome of the regression analysis suggests that cars with automatic transmission achieve on average 2.936 more miles per gallon than cars with manual transmission when controlling for the cars' weights as well as the qsec performance measure. Also, since the 95\% confidence interval for this parameter estimate is positive, a statistical test would allow us to reject the null hypothesis that both car types have a similar mpg (and hence the differences would be random).
+However, as can be seen from the exploratory analyses, the input parameters are highly correlated. For this reason, coefficient estimates for single parameters are highly unreliable due to multicollinearity. Hence, a more profound analysis should be performed where first the correlations between input variables have to be resolved as well as more in-depth explorations of the distribution of residuals had to be performed in order to shed light on the reliability of the results. However, this would be beyond the scope of this report.
 
 # Appendix: Code & Graphs
 
